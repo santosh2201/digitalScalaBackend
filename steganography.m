@@ -1,66 +1,36 @@
-function [output] = steganography(img,msg,enc_key,enc_dec,secfn)% secfn= newfilename, msg= *.txt, enc_key=key(0-255), enc_dec=(1 for encoding, 2 for decoding)
-%enc_dec = input('Welcome to the Steganography Program \nEnter 1 for Encoding, 2 for Decoding:\n');
+function [result] = steganography(image,secret_message,password,encoding_or_decoding,output_file_name);
+% output_file_name= newfilename, 
+%secret_message= string or *.txt file, 
+%password= key(0-255),
+%encoding_or_decoding=(1 for encoding, 2 for decoding)
 
-if enc_dec == 1
-  %  [FileName,PathName] = uigetfile({'*.jpg';'*.png';'*.gif';'*.bmp'},'Select "Canvas Image" to Hide Message.');
-   % img = imread( strcat(PathName,FileName) );
-    %msg_type = input('Enter 1 for TEXT Message, 2 for IMAGE Message:\n');
-    %if msg_type == 1
-    %[FileName,PathName] = uigetfile('*.txt','Select TEXT MESSAGE.');
-    %testmsg = fopen( strcat(PathName,FileName) );
-    %[msg] = fscanf(msg,'%c');
-    
-    %% STEP 3A: Prompt User for Encryption Key
-    %enc_key = input('Please Enter an Encryption Key Between 0 - 255:\n');
-    if enc_key < 0 || enc_key > 255
-        error('Invalid Key Selection');
+if encoding_or_decoding == 1 % for ecoding
+    if password < 0 || password > 255
+        error('invalid key');
     end
-    
-    enc_key = uint8(enc_key);
-    
-    % SEQUENTIAL ENCODING: This only needs an Encryption Key Input.
-    output = stegancoder(img,msg,enc_key);
-    
-   % secfn = input('Enter File Name for Image + Message:\n','s');
-    nametest = ischar(secfn);
-    if nametest == 1
-        imwrite(output,strcat(secfn,'.bmp'));
+    password = uint8(password);
+   	result = encoder(image,secret_message,password);    
+    if ischar(output_file_name) == 1
+        imwrite(result,strcat(output_file_name,'.bmp'));
     else
-        error('Invalid File Name');
+        error('file name invalid');
     end
     
-elseif enc_dec == 2
-   % [FileName,PathName] = uigetfile('*.bmp','Select "Canvas Image" With Hidden Message.');
-    %img = imread( strcat(PathName,FileName) );
     
-   % enc_key = input('Please Enter an Encryption Key Between 0 - 255:\n');
-    if enc_key < 0 || enc_key > 255
-        error('Invalid Key Selection');
+elseif encoding_or_decoding == 2 % for decoding
+    if password < 0 || password > 255
+        error('invalid key');
     end
-    
-    enc_key = uint8(enc_key);
-    
-    output = stegandecoder(img,enc_key);
-    
-   % secfn = input('Enter File Name for Image + Message:\n','s');
-    nametest = ischar(secfn);
-    if nametest == 1
-        %msgtest = ischar(output);
-        % TEXT Message CASE
-        fid = fopen(strcat(secfn,'.txt'),'w');
-        fwrite(fid,output,'char');
-        fclose(fid);
-        
+    password = uint8(password);
+    result = decoder(image,password);
+    if ischar(output_file_name) == 1
+        sec_file = fopen(strcat(output_file_name,'.txt'),'w');
+        fwrite(sec_file,result,'char');
+        fclose(sec_file);        
     else
-        error('Invalid File Name');
+        error('file name invalid');
     end
-    
 else
-    error('Invalid Selection');
+    error('invalid, neither encoding nor decoding selected');
 end
-
-
-
-
-
 
